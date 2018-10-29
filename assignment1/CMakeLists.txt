@@ -30,9 +30,9 @@ pkg_search_module(GLFW REQUIRED glfw3)
 include_directories(${GLFW_INCLUDE_DIRS})
 
 
-add_executable(test src/main.cpp include/mesh.h)
-target_link_libraries(test ${GLFW_LIBRARIES} ${frameworks})
-#target_link_libraries(test ${GLFW_STATIC_LIBRARIES})
-
-#add_executable(test2 src/test.cpp src/obj_reading.cpp include/obj_reading.h)
-#target_link_libraries(test2 ${GLFW_LIBRARIES} ${frameworks})
+add_executable(assignment1 src/main.cpp include/mesh.h)
+target_link_libraries(assignment1 ${GLFW_LIBRARIES} ${frameworks})
+# auto copy the glsl&obj files
+add_custom_command(TARGET assignment1 PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/config $<TARGET_FILE_DIR:assignment1>)

@@ -23,8 +23,6 @@
 // Function prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void do_movement();
 bool loadOBJ(
     const char * path,
@@ -73,8 +71,6 @@ int main() {
   // Set the required callback functions
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetKeyCallback(window, key_callback);
-  glfwSetCursorPosCallback(window, mouse_callback);
-  glfwSetScrollCallback(window, scroll_callback);
 
   // Initialize GLAD to setup the OpenGL Function pointers
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -299,28 +295,6 @@ void do_movement()
     meshRotate.ProcessKeyboard(G_CHANGE, deltaTime);
   if (keys[GLFW_KEY_M] && displayMode<3)
     meshRotate.ProcessKeyboard(B_CHANGE, deltaTime);
-}
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-  if (firstMouse)
-  {
-    lastX = xpos;
-    lastY = ypos;
-    firstMouse = false;
-  }
-
-  GLfloat xoffset = xpos - lastX;
-  GLfloat yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to left
-  lastX = xpos;
-  lastY = ypos;
-
-  // camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-  // camera.ProcessMouseScroll(yoffset);
 }
 
 
