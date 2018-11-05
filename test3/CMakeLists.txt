@@ -25,18 +25,15 @@ set(frameworks
     ${opengl_lib}
     ${corefoundation_lib})
 
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
+find_library(glfw3 REQUIRED)
 include_directories(${GLFW_INCLUDE_DIRS})
 
-#pkg_search_module(SOIL REQUIRED SOIL)
 FIND_PATH( SOIL_INCLUDE_DIRS SOIL.h PATH_SUFFIXES SOIL)
 find_library(SOIL_LIBRARIES SOIL)
 include_directories(${SOIL_INCLUDE_DIRS})
 
-
 add_executable(test src/main.cpp src/glad.c)
-target_link_libraries(test ${GLFW_LIBRARIES} ${frameworks} ${SOIL_LIBRARIES})
+target_link_libraries(test glfw ${frameworks} ${SOIL_LIBRARIES})
 # auto copy the glsl&obj files
 add_custom_command(TARGET test PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
