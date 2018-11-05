@@ -1,6 +1,6 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 cmake_minimum_required(VERSION 3.12)
-project(test)
+project(assinment2)
 
 set(CMAKE_CXX_STANDARD 11)
 #set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -17,13 +17,13 @@ find_library(opengl_lib OpenGL)
 find_library(corefoundation_lib CoreFoundation)
 
 set(frameworks
-    ${carbon_lib}
-    ${iokit_lib}
-    ${forcefeedback_lib}
-    ${cocoa_lib}
-    ${corevideo_lib}
-    ${opengl_lib}
-    ${corefoundation_lib})
+        ${carbon_lib}
+        ${iokit_lib}
+        ${forcefeedback_lib}
+        ${cocoa_lib}
+        ${corevideo_lib}
+        ${opengl_lib}
+        ${corefoundation_lib})
 
 find_package(glfw3 REQUIRED)
 include_directories(${GLFW_INCLUDE_DIRS})
@@ -32,9 +32,10 @@ FIND_PATH( SOIL_INCLUDE_DIRS SOIL.h PATH_SUFFIXES SOIL)
 find_library(SOIL_LIBRARIES SOIL)
 include_directories(${SOIL_INCLUDE_DIRS})
 
-add_executable(test src/main.cpp src/glad.c)
-target_link_libraries(test glfw ${frameworks} ${SOIL_LIBRARIES})
+
+add_executable(assinment2 src/main.cpp src/glad.c)
+target_link_libraries(assinment2 glfw ${frameworks} ${SOIL_LIBRARIES})
 # auto copy the glsl&obj files
-add_custom_command(TARGET test PRE_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/config $<TARGET_FILE_DIR:test>)
+add_custom_command(TARGET assinment2 PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/config $<TARGET_FILE_DIR:assinment2>)
