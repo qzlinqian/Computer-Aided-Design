@@ -144,8 +144,11 @@ int main() {
 
     line.PositionUpdate(deltaTime);
     for (int i=0;i<line.Positions.size();i++){
+      // draw every star
+      // move star in the position
       glm::mat4 model(1);
       model = glm::translate(model, line.Positions[i]);
+      // find the color
       glm::vec3 color(1);
       int tempIndex=line.Colors[i];
       color = line.colorType[tempIndex];
