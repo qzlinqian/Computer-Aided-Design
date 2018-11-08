@@ -44,3 +44,7 @@ target_link_libraries(test1 glfw ${frameworks} ${SOIL_LIBRARIES} ${FREETYPE_LIBR
 add_custom_command(TARGET test1 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_SOURCE_DIR}/config $<TARGET_FILE_DIR:test1>)
+
+add_executable(test2 src/main1.cpp src/glad.c)
+target_link_libraries(test2 glfw ${frameworks} ${SOIL_LIBRARIES} ${FREETYPE_LIBRARIES})
+
