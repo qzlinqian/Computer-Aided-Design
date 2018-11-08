@@ -39,12 +39,10 @@ int main()
 {
     // Init GLFW
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
     
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Text", nullptr, nullptr); // Windowed
     glfwMakeContextCurrent(window);
@@ -54,7 +52,7 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-    
+
     // Set OpenGL options
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
@@ -137,7 +135,7 @@ int main()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
+
     // Game loop
     while (!glfwWindowShouldClose(window))
     {
@@ -147,6 +145,10 @@ int main()
         // Clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        /* auto move window to solve the Mojave + Xcode10 problem of open with a black window
+        (the content would only show after the window being resized or moved)*/
+        glfwSetWindowPos(window, 100, 100);
         
         RenderText(shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
         RenderText(shader, "Freetype text", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
