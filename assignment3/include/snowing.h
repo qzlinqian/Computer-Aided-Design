@@ -7,8 +7,8 @@
 
 class Snowing{
 public:
-  std::vector<glm::vec3> Positions;
-  std::vector<GLfloat> Scales;
+  std::vector<glm::vec3> Positions; // where to put the snow flake center
+  std::vector<GLfloat> Scales; // the scale of the flake
 
   Snowing(int size=1000, GLfloat speed=0.1f):_size(size),_speed(speed),times(0){
 //    long temp = random();
@@ -19,8 +19,8 @@ public:
 
   void addFlake(bool init){
     glm::vec3 newPos;
-    newPos.x = (random() * 2.0f) / RAND_MAX - 1;
-    newPos.y = init? (random() * 2.0f) /RAND_MAX - 1 : 1.1f;
+    newPos.x = (random() * 2.0f) / RAND_MAX - 1;  // (-1,1)
+    newPos.y = init? (random() * 2.0f) /RAND_MAX - 1 : 1.1f; // init? (-1,1) : 1.1f (from the top)
     newPos.z = 0.0f;
     Positions.push_back(newPos);
     Scales.push_back((random()*1.0f)/RAND_MAX);
@@ -28,9 +28,9 @@ public:
 
   void positionUpdate(GLfloat deltaTime){
     for (int i=0;i<getFlakeSize();i++){
-      Positions[i].y -= deltaTime * _speed;
+      Positions[i].y -= deltaTime * _speed; // falling down -> y-
       if (Positions[i].y < -1.2f){
-        Positions[i].y += 2.4f;
+        Positions[i].y += 2.4f; // no need to deleted the particle, just let it start from the top, so the number of the flake would continue to grow
         Scales[i] = (random()*1.0f)/RAND_MAX;
       }
     }

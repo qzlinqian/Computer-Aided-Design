@@ -24,7 +24,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 // Window dimensions
-GLuint WIDTH = 800, HEIGHT = 600;
+GLuint WIDTH = 600, HEIGHT = 600;
 
 Snowing falling;
 
@@ -96,7 +96,6 @@ int main() {
   // TexCoord attribute
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-//  glEnableVertexAttribArray(1);
 
   glBindVertexArray(0); // Unbind snowVAO
 
@@ -127,7 +126,8 @@ int main() {
       -1.0f, -1.0f,  0.0f,        0.0f, 0.0f, // Bottom Left
       -1.0f,  1.0f,  0.0f,        0.0f, 1.0f  // Top Left
   };
-  // castle indices = indices
+  // castle indices = indices, no need to write again
+  // actually, the castleVertices can also use vertices -- just re-scale in the loop
   GLuint castleVBO, castleVAO, castleEBO;
   glGenVertexArrays(1, &castleVAO);
   glGenBuffers(1, &castleVBO);
@@ -165,7 +165,7 @@ int main() {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width2, height2, 0, GL_RGB, GL_UNSIGNED_BYTE, imageCastle);
   glGenerateMipmap(GL_TEXTURE_2D);
   SOIL_free_image_data(imageCastle);
-  glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done
+  glBindTexture(GL_TEXTURE_2D, 0); // Unbind castleTexture when done
 
 
   // Game loop
@@ -194,8 +194,6 @@ int main() {
     // Activate shader
     ourShader.Use();
 
-
-
     // Draw castle
     glBindVertexArray(castleVAO);
     // Bind Texture
@@ -208,7 +206,7 @@ int main() {
     glBindVertexArray(snowVAO);
     // Bind Texture
     glBindTexture(GL_TEXTURE_2D, snowTexture);
-    for (int i=0;i<falling.getFlakeSize();i++){
+    for (int i=0;i<falling.getFlakeSize();i++){ // draw snow flake according to the positions and scales
       model = glm::mat4(1);
       model = glm::translate(model, falling.Positions[i]);
       GLfloat tempSize = falling.Scales[i];
