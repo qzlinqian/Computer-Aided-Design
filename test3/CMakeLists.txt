@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/../include)
 
 find_library(carbon_lib Carbon) # we look for the Carbon framework and use carbon_lib as an alias for it
 find_library(iokit_lib IOKit)

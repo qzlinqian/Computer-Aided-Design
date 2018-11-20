@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_ROOT}/Modules)
 
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/../include)
 
 find_library(carbon_lib Carbon) # we look for the Carbon framework and use carbon_lib as an alias for it
 find_library(iokit_lib IOKit)
@@ -38,7 +39,7 @@ find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
 
-add_executable(assignment4 src/main.cpp src/glad.c)
+add_executable(assignment4 src/main.cpp ../include/glad.c)
 target_link_libraries(assignment4 glfw ${frameworks} ${SOIL_LIBRARIES} ${FREETYPE_LIBRARIES})
 # auto copy the glsl&obj files
 add_custom_command(TARGET assignment4 PRE_BUILD

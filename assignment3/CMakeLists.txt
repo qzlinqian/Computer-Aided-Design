@@ -33,7 +33,7 @@ find_library(SOIL_LIBRARIES SOIL)
 include_directories(${SOIL_INCLUDE_DIRS})
 
 
-add_executable(assinment3 src/main.cpp src/glad.c)
+add_executable(assinment3 src/main.cpp ../include/glad.c)
 target_link_libraries(assinment3 glfw ${frameworks} ${SOIL_LIBRARIES})
 # auto copy the glsl&obj files
 add_custom_command(TARGET assinment3 PRE_BUILD
