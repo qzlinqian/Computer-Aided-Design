@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <map>
 
 // GLAD
 #include <glad/glad.h>
@@ -32,6 +33,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void do_movement();
 void generateSphere(std::vector<GLfloat>& vertices, GLfloat x=0, GLfloat y=0, GLfloat z=0, GLfloat radius=0.5);
+void RenderText(Shader &shader, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);
 
 
 // Window dimensions
@@ -51,6 +53,18 @@ bool keys[1024];
 // Deltatime
 GLfloat deltaTime = 0.0f;    // Time between current frame and last frame
 GLfloat lastFrame = 0.0f;      // Time of last frame
+
+// Holds all state information relevant to a character as loaded using FreeType
+struct Character {
+  GLuint TextureID;   // ID handle of the glyph texture
+  glm::ivec2 Size;    // Size of glyph
+  glm::ivec2 Bearing;  // Offset from baseline to left/top of glyph
+  GLuint Advance;    // Horizontal offset to advance to next glyph
+};
+
+std::map<GLchar, Character> Characters;
+GLuint VAOF, VBOF;
+
 
 // The MAIN function, from here we start the application and run the game loop
 int main() {
@@ -77,10 +91,17 @@ int main() {
   }
 
 //  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
   // Build and compile our shader program
   Shader ourShader("main.vert.glsl", "main.frag.glsl");
+  Shader textShader("text.vert.glsl", "text.frag.glsl");
+  glm::mat4 projectionText =  glm::perspective(45.0f, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+  textShader.Use();
+  glUniformMatrix4fv(glGetUniformLocation(textShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projectionText));
 
   // get sphere vertices
   std::vector<GLfloat> vertices;
@@ -126,9 +147,83 @@ int main() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[i], height[i], 0, GL_RGB, GL_UNSIGNED_BYTE, image[i]);
     glGenerateMipmap(GL_TEXTURE_2D);
     SOIL_free_image_data(image[i]);
-    glBindTexture(GL_TEXTURE_2D, 0);
   }
+  glBindTexture(GL_TEXTURE_2D, 0);
 
+  // Planet names
+  std::string planetName[10] = {"Sun", "Mercury", "Venus", "Earth", "Moon", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
+
+
+  // FreeType
+  FT_Library ft;
+  // All functions return a value different than 0 whenever an error occurred
+  if (FT_Init_FreeType(&ft))
+    std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+
+  // Load font as face
+  FT_Face face;
+  if (FT_New_Face(ft, "arial.ttf", 0, &face))
+    std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+
+  // Set size to load glyphs as
+  FT_Set_Pixel_Sizes(face, 0, 48);
+
+  // Disable byte-alignment restriction
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  // Load first 128 characters of ASCII set
+  for (GLubyte c = 0; c < 128; c++)
+  {
+    // Load character glyph
+    if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+    {
+      std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+      continue;
+    }
+    // Generate texture
+    GLuint textureF;
+    glGenTextures(1, &textureF);
+    glBindTexture(GL_TEXTURE_2D, textureF);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RED,
+        face->glyph->bitmap.width,
+        face->glyph->bitmap.rows,
+        0,
+        GL_RED,
+        GL_UNSIGNED_BYTE,
+        face->glyph->bitmap.buffer
+    );
+    // Set texture options
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Now store character for later use
+    Character character = {
+        textureF,
+        glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+        glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+        GLuint(face->glyph->advance.x)
+    };
+    Characters.insert(std::pair<GLchar, Character>(c, character));
+  }
+  glBindTexture(GL_TEXTURE_2D, 0);
+  // Destroy FreeType once we're finished
+  FT_Done_Face(face);
+  FT_Done_FreeType(ft);
+
+  // Configure VAO/VBO for texture quads
+  glGenVertexArrays(1, &VAOF);
+  glGenBuffers(1, &VBOF);
+  glBindVertexArray(VAOF);
+  glBindBuffer(GL_ARRAY_BUFFER, VBOF);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 
 
   // Game loop
@@ -145,9 +240,12 @@ int main() {
 
     // Render
     // Clear the colorbuffer
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glDisable(GL_DEPTH_TEST);
+//    RenderText(textShader, "test", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+//    RenderText(textShader, "This is sample text", 0.0f, 0.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
     // Activate shader
     ourShader.Use();
     glEnable(GL_DEPTH_TEST);
@@ -170,28 +268,46 @@ int main() {
     // Pass the matrices to the shader
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    /*// Get the uniform locations
-    GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
-    // Pass the matrices to the shader
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));*/
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     rotation.PositionUpdate(deltaTime);
 
+    // pass parameter to text shader
+    textShader.Use();
+    GLint viewLocText = glGetUniformLocation(textShader.Program, "view");
+    GLint projLocText = glGetUniformLocation(textShader.Program, "projection");
+    glUniformMatrix4fv(viewLocText, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projLocText, 1, GL_FALSE, glm::value_ptr(projection));
+
+    // active main shader again
+    ourShader.Use();
+
 
     for (int i=0;i<10;i++){
-      glActiveTexture(texture[i]);//
-      glBindTexture(GL_TEXTURE_2D, texture[i]);
+      // Calculate the x, y position of the star
+      GLfloat xNow = 0, zNow = 0;
       // model should be reset every time
       model = glm::mat4(1);
+      // put the matrix by reversed order
       if (i == 4){ // Moon
         model = glm::rotate(model, glm::radians(rotation.orbitAngle[3]), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::translate(model, rotation.Positions[3]);
+        xNow = rotation.Positions[3].x * std::cos(rotation.orbitAngle[3] * PI / 180);
+        zNow = -rotation.Positions[3].x * std::sin(rotation.orbitAngle[3] * PI / 180);
       }
       model = glm::rotate(model, glm::radians(rotation.orbitAngle[i]), glm::vec3(0.0f, 1.0f, 0.0f));
       model = glm::translate(model, rotation.Positions[i]);
+      xNow += rotation.Positions[i].x * std::cos(rotation.orbitAngle[i] * PI / 180);
+      zNow -= rotation.Positions[i].x * std::sin(rotation.orbitAngle[i] * PI / 180);
 
+      textShader.Use();
+//      glBindVertexArray(VAOF);
+      GLint zLocText = glGetUniformLocation(textShader.Program, "z");
+      glUniform1f(zLocText, zNow);
+      RenderText(textShader, planetName[i], xNow, rotation.Radius[i] * 0.5 + 0.005f, 0.0001f, glm::vec3(1.0f, 1.0f, 0.0f));
+      ourShader.Use();
+      glBindVertexArray(VAO);
 
       GLfloat scaleTime = rotation.Radius[i];
       model = glm::scale(model, glm::vec3(scaleTime, scaleTime, scaleTime));
@@ -200,8 +316,10 @@ int main() {
       // Pass the matrices to the shader
       glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-      glPolygonMode(GL_FRONT, GL_FILL);
+//      glPolygonMode(GL_FRONT, GL_FILL);
 
+      glActiveTexture(texture[i]);//
+      glBindTexture(GL_TEXTURE_2D, texture[i]);
       glBindVertexArray(VAO);
       glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size()/5 * 3);
       glBindVertexArray(0);
@@ -291,4 +409,52 @@ void generateSphere(std::vector<GLfloat >& vertices, GLfloat x, GLfloat y, GLflo
       vertices.emplace_back((phi+91) * yStep);
     }
   }
+}
+
+
+// for words display
+void RenderText(Shader &shader, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
+//  glDisable(GL_DEPTH_TEST);
+  // Activate corresponding render state
+  shader.Use();
+  glUniform3f(glGetUniformLocation(shader.Program, "textColor"), color.x, color.y, color.z);
+  glActiveTexture(GL_TEXTURE0);
+  glBindVertexArray(VAOF);
+
+  // Iterate through all characters
+  std::string::const_iterator c;
+  for (c = text.begin(); c != text.end(); c++)
+  {
+    Character ch = Characters[*c];
+
+    GLfloat xpos = x + ch.Bearing.x * scale;
+    GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+    GLfloat w = ch.Size.x * scale;
+    GLfloat h = ch.Size.y * scale;
+    // Update VBO for each character
+    GLfloat verticesFt[6][4] = {
+        { xpos,     ypos + h,   0.0, 1.0 },
+        { xpos,     ypos,       0.0, 0.0 },
+        { xpos + w, ypos,       1.0, 0.0 },
+
+        { xpos,     ypos + h,   0.0, 1.0 },
+        { xpos + w, ypos,       1.0, 0.0 },
+        { xpos + w, ypos + h,   1.0, 1.0 }
+    };
+    // Render glyph texture over quad
+    glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+    // Update content of VBO memory
+    glBindBuffer(GL_ARRAY_BUFFER, VBOF);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verticesFt), verticesFt); // Be sure to use glBufferSubData and not glBufferData
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // Render quad
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+    x += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+  }
+  glBindVertexArray(0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+//  glEnable(GL_DEPTH_TEST);
 }
