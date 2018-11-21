@@ -42,13 +42,7 @@ GLuint WIDTH = 800, HEIGHT = 600;
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
-// plot mode
-//int displayMode=4;
-// color changing with keyboard
-
 bool keys[1024];
-//GLfloat lastX = 400, lastY = 300;
-//bool firstMouse = true;
 
 // Deltatime
 GLfloat deltaTime = 0.0f;    // Time between current frame and last frame
@@ -62,6 +56,7 @@ struct Character {
   GLuint Advance;    // Horizontal offset to advance to next glyph
 };
 
+// text display
 std::map<GLchar, Character> Characters;
 GLuint VAOF, VBOF;
 
@@ -77,7 +72,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
   // Create a GLFWwindow object that we can use for GLFW's functions
-  GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "MeshDisplay", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Rotation", NULL, NULL);
   glfwMakeContextCurrent(window);
 
   // Set the required callback functions
@@ -227,8 +222,11 @@ int main() {
 
 
   // Game loop
-  while (!glfwWindowShouldClose(window))
-  {
+  while (!glfwWindowShouldClose(window)) {
+    /* auto move window to solve the Mojave + Xcode10 problem of open with a black window
+        (the content would only show after the window being resized or moved)*/
+    glfwSetWindowPos(window, 100, 100);
+    
     // Calculate deltatime of current frame
     GLfloat currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
@@ -242,21 +240,15 @@ int main() {
     // Clear the colorbuffer
     glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glDisable(GL_DEPTH_TEST);
-//    RenderText(textShader, "test", 0.0f, 0.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-//    RenderText(textShader, "This is sample text", 0.0f, 0.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
     // Activate shader
     ourShader.Use();
     glEnable(GL_DEPTH_TEST);
 
-//    glBindVertexArray(VAO);
     // model
     glm::mat4 model(1);
     // Camera/View transformation
     glm::mat4 view(1);
     view = camera.GetViewMatrix();
-//    view = glm::lookAt(glm::vec3(0.0f,0.0f,-10.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f));
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.0f));
     // Projection
     glm::mat4 projection(1);
@@ -269,9 +261,8 @@ int main() {
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    rotation.PositionUpdate(deltaTime);
+    rotation.PositionUpdate(deltaTime);  // update planets' position
 
     // pass parameter to text shader
     textShader.Use();
@@ -293,7 +284,7 @@ int main() {
       if (i == 4){ // Moon
         model = glm::rotate(model, glm::radians(rotation.orbitAngle[3]), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::translate(model, rotation.Positions[3]);
-        xNow = rotation.Positions[3].x * std::cos(rotation.orbitAngle[3] * PI / 180);
+        xNow = rotation.Positions[3].x * std::cos(rotation.orbitAngle[3] * PI / 180);  // text position
         zNow = -rotation.Positions[3].x * std::sin(rotation.orbitAngle[3] * PI / 180);
       }
       model = glm::rotate(model, glm::radians(rotation.orbitAngle[i]), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -302,10 +293,12 @@ int main() {
       zNow -= rotation.Positions[i].x * std::sin(rotation.orbitAngle[i] * PI / 180);
 
       textShader.Use();
-//      glBindVertexArray(VAOF);
+      // text.x = planet.x, text.z = planet.z, text.y = planet.radius + offset
+      // if (planet != moon) planet.x = range * cos(orbitRotateAngle); range = Position[i].x
       GLint zLocText = glGetUniformLocation(textShader.Program, "z");
       glUniform1f(zLocText, zNow);
-      RenderText(textShader, planetName[i], xNow, rotation.Radius[i] * 0.5 + 0.005f, 0.0001f, glm::vec3(1.0f, 1.0f, 0.0f));
+      RenderText(textShader, planetName[i], xNow, rotation.Radius[i] * 0.5 + 0.005f, 0.0003f, glm::vec3(1.0f, 1.0f, 0.0f));
+      // Shader, VAO, Texture for planet should bind again. Cause the RenderText(...) actives shader, VAO, Texture for text
       ourShader.Use();
       glBindVertexArray(VAO);
 
@@ -316,19 +309,11 @@ int main() {
       // Pass the matrices to the shader
       glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-//      glPolygonMode(GL_FRONT, GL_FILL);
-
-      glActiveTexture(texture[i]);//
-      glBindTexture(GL_TEXTURE_2D, texture[i]);
-      glBindVertexArray(VAO);
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size()/5 * 3);
+      glActiveTexture(texture[i]);  // that might not be default, so should active first
+      glBindTexture(GL_TEXTURE_2D, texture[i]);  // texture for this planet
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size()/5 * 3);  // every vertex used for 3 times; every vertex has 5 GLfloat
       glBindVertexArray(0);
     }
-
-    /*glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 36);
-    glBindVertexArray(0);*/
 
     // Swap the screen buffers
     glfwSwapBuffers(window);
@@ -394,8 +379,9 @@ void generateSphere(std::vector<GLfloat >& vertices, GLfloat x, GLfloat y, GLflo
   // GLfloat thetaStep = 1, phiStep = 1;
   for (GLint phi = -90; phi<90; phi ++){
     for (GLint theta = 0; theta <= 360; theta ++){
-      // GLfloat r = radius * std::cos(phi * PI / 180); // the radius of this small circle !!! this is erroneous, it would only generate 179 cylindrical surfaces
-      GLfloat x_this = radius * std::cos(theta * PI / 180), y_this = radius * std::sin(theta * PI / 180); // fixed theta -> fixed x,y; varied z
+      // GLfloat r = radius * std::cos(phi * PI / 180); // the radius of this small circle !!!
+      // former: "fixed theta -> fixed x,y; varied z" this is erroneous, it would only generate 180 cylindrical surface
+      GLfloat x_this = radius * std::cos(theta * PI / 180), y_this = radius * std::sin(theta * PI / 180);
       vertices.emplace_back(std::cos(phi * PI / 180) * x_this +x);
       vertices.emplace_back(std::cos(phi * PI / 180) * y_this +y);
       vertices.emplace_back(radius * std::sin(phi * PI / 180) +z); // first point on this line
@@ -414,7 +400,6 @@ void generateSphere(std::vector<GLfloat >& vertices, GLfloat x, GLfloat y, GLflo
 
 // for words display
 void RenderText(Shader &shader, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
-//  glDisable(GL_DEPTH_TEST);
   // Activate corresponding render state
   shader.Use();
   glUniform3f(glGetUniformLocation(shader.Program, "textColor"), color.x, color.y, color.z);
@@ -456,5 +441,4 @@ void RenderText(Shader &shader, std::string text, GLfloat x, GLfloat y, GLfloat 
   }
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
-//  glEnable(GL_DEPTH_TEST);
 }

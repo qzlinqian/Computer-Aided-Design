@@ -10,7 +10,7 @@
 
 //
 // Created by Qian Lin on 2018/11/19.
-//
+// Did not realize self rotate
 
 #ifndef ASSIGNMENT4_ROTATE_H
 #define ASSIGNMENT4_ROTATE_H
