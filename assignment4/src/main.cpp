@@ -226,7 +226,7 @@ int main() {
     /* auto move window to solve the Mojave + Xcode10 problem of open with a black window
         (the content would only show after the window being resized or moved)*/
     glfwSetWindowPos(window, 100, 100);
-    
+
     // Calculate deltatime of current frame
     GLfloat currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
