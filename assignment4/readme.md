@@ -1,6 +1,6 @@
 ## 行星绕太阳
 
-
+![](demo.gif)
 
 #### 作业要求
 
@@ -46,7 +46,7 @@
 
 ![](draw_sphere.png)
 
-* 在src/main.cpp中的void generateSphere函数中进行。（默认半径是0.5）。从$$\phi=-90^{\circ}$$，每次增1，一直到$$\phi=89^{\circ}$$。在每一个$$\phi$$值下，$$\theta$$从0遍历到360（每次增1）。在每一对$$(\theta, \phi)$$值下，画出点$$(r \cdot cos\theta \cdot cos\phi, r \cdot sin\theta \cdot cos\phi, r \cdot sin\phi )$$及点$$(r \cdot cos\theta \cdot cos(\phi+1), r \cdot sin\theta \cdot cos(\phi+1), r \cdot sin(\phi+1) )$$。最后按照`GL_TRIANGLE_STRIP`画三角形。
+* 在src/main.cpp中的void generateSphere函数中进行。（默认半径是0.5，流程如下）![](sphere_generate.png)最后按照`GL_TRIANGLE_STRIP`画三角形。
 
 ##### 文字添加
 
