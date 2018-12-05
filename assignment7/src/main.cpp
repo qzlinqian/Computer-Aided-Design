@@ -25,9 +25,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void Do_Movement();
 bool loadOBJ(
     const char * path,
-    std::vector<glm::vec3> & out_vertices,
-    std::vector<glm::vec2> & out_uvs,
-    std::vector<glm::vec3> & out_normals
+    std::vector<glm::vec3> &out_vertices,
+    std::vector<glm::vec2> &out_uvs,
+    std::vector<glm::vec3> &out_normals
 );
 void normalCal(std::vector<glm::vec3> const& vertices, std::vector<glm::vec3> &normals);
 
@@ -52,8 +52,6 @@ GLfloat lastFrame = 0.0f;      // Time of last frame
 
 // The MAIN function, from here we start the application and run the game loop
 int main() {
-  // rand seed
-  srand((unsigned)time(nullptr));
   // Init GLFW
   glfwInit();
   // Set all the required options for GLFW
@@ -83,8 +81,6 @@ int main() {
 
   // Build and compile our shader program
   Shader ourShader("main.vert.glsl", "main.frag.glsl");
-//  Shader ourShader("test.vert.glsl", "test.frag.glsl");
-
 
   // Read our obj file
   std::vector<glm::vec3> vertices;
@@ -114,7 +110,7 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
   glEnableVertexAttribArray(0);
 
-  // normals data
+  // normals data, remember to GenBuffers again
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
