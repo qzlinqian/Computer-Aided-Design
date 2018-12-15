@@ -1,0 +1,44 @@
+TODO list
+Legend:
+#   - must edit this file
+*   - should look at (header) file
+
+README              -- this file
+writeup.txt#        -- Description of your project and implementation.
+
+src/physics/        == Project-specific files.
+    body*           -- contains the parent class for physical bodies
+    collisions#     -- contains functions for detecting collisions                  Completed   Not tested
+    main            -- contains main function for project
+    physics#        -- contains the physics object which contains all physical
+                        objects and updates everything. Must edit to implement
+                        RK4 for spheres.
+    planebody*      -- contains the planebody class. Mostly just a container
+    spherebody#     -- contains the spherebody class. Must edit to do step and
+                        application of forces
+    spring#         -- contains the spring class. Must edit so that it applies      Completed
+                        spring forces to objects
+    trianglebody*   -- contains the trianglebody class. Like the planebody class
+                        it is mostly just a container
+
+src/application/    == General application files. You can ignore all of it.
+    application     -- SDL backend, runs main loop.
+    camera_roam     -- camera controller
+    imageio         -- used for outputting images
+    opengl          -- Header to include correct OpenGL headers.
+    scene_loader    -- Code to load a scene from a file.
+
+src/math/           == Math utilities.
+    camera          -- Camera class with functions to mutate.
+    color           -- A class for RGB colors and related functions.
+    math            -- Basic header and a few generic functions.
+    matrix          -- 3D, 4D matrix classes and several related functions.
+    quaternion      -- Quaternion class and several related functions--very
+                        useful for 3D rotations.
+    vector          -- 2D, 3D, 4D vector classes and many related functions.
+
+src/scene/          == Scene-specific files and rendering. You can ignore all
+                        of this (mostly the same as raytracer scene files)
+
+src/tinyxml/         == XML parser
+    ...             -- Don't worry about it, you'll be better off
