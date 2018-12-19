@@ -6,7 +6,7 @@ namespace _462 {
 bool collides( SphereBody& body1, SphereBody& body2, real_t collision_damping )
 {
     // TODO detect collision. If there is one, update velocity
-    Vector3 d = body1.position - body2.position;
+    Vector3 d = body2.position - body1.position;
     real_t dis = length(d);
     if (dis > body1.radius + body2.radius) return false;  // d>r1+r2
     // Then update velocity
@@ -22,7 +22,7 @@ bool collides( SphereBody& body1, TriangleBody& body2, real_t collision_damping 
 {
     // TODO detect collision. If there is one, update velocity
     Vector3 a = body1.position - body2.vertices[0];
-    Vector3 normal = cross(body2.vertices[0]-body2.vertices[1], body2.vertices[0]-body2.vertices[2]);
+    Vector3 normal = normalize(cross(body2.vertices[0]-body2.vertices[1], body2.vertices[0]-body2.vertices[2]));
     real_t d = dot(a, normal);
     if (std::abs(d) > body1.radius) return false;  // d > r
     // Projection near the plane
@@ -52,7 +52,7 @@ bool collides( SphereBody& body1, TriangleBody& body2, real_t collision_damping 
         if (distance(body1.position, proj_line[i] * (body2.vertices[(i+1)%3]-body2.vertices[i]) + body2.vertices[i]) < body1.radius){
             // In collision! Then update the velocity
             // Let the possibility of collide with the vertex is 0. Allocate the case into collide with line
-            Vector3 normal_line = cross(normal, body2.vertices[(i+1)%3]-body2.vertices[i]);
+            Vector3 normal_line = normalize(cross(normal, body2.vertices[(i+1)%3]-body2.vertices[i]));
             // Velocity update
             body1.velocity -= 2 * dot(body1.velocity, normal_line) * normal_line;
             return true;
