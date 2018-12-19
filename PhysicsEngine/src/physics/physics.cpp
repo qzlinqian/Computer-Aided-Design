@@ -25,23 +25,55 @@ void Physics::step( real_t dt )
     // change the position/orientation of the graphical object that represents
     // it
     // TODO collision check & velocity update
+    for ( PlaneList::iterator i = planes.begin(); i != planes.end(); i++ ){
+        for ( SphereList::iterator j = spheres.begin(); j != spheres.end(); j++ ){
+            collides(*(*j),*(*i),collision_damping);
+        }
+    }
+
+    for ( TriangleList::iterator i = triangles.begin(); i != triangles.end(); i++ ){
+        for ( SphereList::iterator j = spheres.begin(); j != spheres.end(); j++ ){
+            collides(*(*j),*(*i),collision_damping);
+        }
+    }
+
+    for ( SphereList::iterator i = spheres.begin(); i != spheres.end(); i++ ){
+        for ( SphereList::iterator j = spheres.begin(); j != spheres.end(); j++ ){
+            if (j<=i) continue;
+            collides(*(*j),*(*i),collision_damping);
+        }
+        // std::cout<<(*i)->position<<std::endl;
+        // std::cout<<(*i)->mass<<std::endl;
+    }
+
+
     for (SpringList::iterator i = springs.begin(); i != springs.end(); i++){
-        *i->step(dt);
-        *i->body1->add_force(this->gravity, 0);
-        *i->body2->add_force(this->gravity, 0);
-        *i->body1->step_position(dt, *i->damping);
-        *i->body1->step_orientation(dt ,*i->damping);
-        *i->body1->position -= *i->body1->velocity * dt;  // Will be added again later, so that we do not need to mark which sphere has been udpated
-        *i->body1->orientation -= *i->body1->angular_velocity * dt;
-        *i->body2->step_position(dt, *i->damping);
-        *i->body2->step_orientation(dt ,*i->damping);
-        *i->body2->position -= *i->body1->velocity * dt;  // Will be added again later
-        *i->body2->orientation -= *i->body2->angular_velocity * dt;
+        // (*i)->step(dt);
+        // (*i)->body1->force += this->gravity;
+        // (*i)->body2->force += this->gravity;
+        // (*i)->body1->step_position(dt, (*i)->damping);
+        // (*i)->body1->step_orientation(dt, (*i)->damping);
+        // (*i)->body1->position -= (*i)->body1->velocity * dt;  // Will be added again later, so that we do not need to mark which sphere has been udpated
+        // (*i)->body1->orientation *= (*i)->body1->angular_velocity * dt;
+        // (*i)->body2->step_position(dt, (*i)->damping);
+        // (*i)->body2->step_orientation(dt, (*i)->damping);
+        // (*i)->body2->position -= (*i)->body1->velocity * dt;  // Will be added again later
+        // (*i)->body2->orientation *= (*i)->body2->angular_velocity * dt;
     }
     
-    for (SpringList::iterator i = springs.begin(); i != springs.end(); i++){
-        i->position += i->velocity * dt;
-        i->orientation += i->angular_velocity * dt;
+    Vector3 temp(0.0f,0.0f,0.0f);
+    real_t j=0;
+    for (SphereList::iterator i = spheres.begin(); i != spheres.end(); i++){
+        // (*i)->reset_force();
+        (*i)->apply_force(this->gravity, temp);
+        // Vector3 tempPos(0.0f,0.0f,j);
+        // (*i)->sphere->position = tempPos;
+        // j += 0.2f;
+        // (*i)->position += (*i)->step_position(dt, 0);
+        // (*i)->orientation *= (*i)->angular_velocity * dt;
+        // (*i)->sphere->position += (*i)->step_position(dt, 0);
+        // (*i)->step_position(dt, 0);
+        // (*i)->sphere->position += temp;
     }
 }
 

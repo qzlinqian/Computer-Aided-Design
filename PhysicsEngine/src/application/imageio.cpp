@@ -29,7 +29,7 @@
 #include "application/opengl.hpp"
 #include "application/application.hpp"
 #include <iostream>
-#include <png.h>
+#include "png.h"
 #include <cassert>
 
 namespace _462 {

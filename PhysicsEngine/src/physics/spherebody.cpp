@@ -8,6 +8,8 @@
 
 namespace _462 {
 
+real_t SphereBody::stopVelocity = 0.01f;
+
 SphereBody::SphereBody( Sphere* geom )
 {
     sphere = geom;
@@ -29,19 +31,25 @@ Vector3 SphereBody::step_position( real_t dt, real_t motion_damping )
     // TODO return the delta in position dt in the future
     // I have to ignore the change in spring force (with x). 
     // Here we see force as a const, and there's damping relating to the velocity, i.e., m v' = Force - cv; v = x'
-    Vector3 a0 = this->force / this->mass;
-    real_t r = motion_damping / this->mass;
-    Vector3 K1 = this->velocity, L1 = a0;
-    Vector3 K2 = this->velocity + L1 * dt/2;
-    Vector3 L2 = a0 - r * K2;
-    Vector3 K3 = this->velocity + L2 * dt/2;
-    Vector3 L3 = a0 - r * K3;
-    Vector3 K4 = this->velocity + L3 * dt;
-    Vector3 L4 = a0 - r * K4;
-    this->velocity += (K1 + 2 * K2 + 2 * K3 + K4) * dt /6;
-    this->position += (L1 + 2 * K2 + 2 * K3 + K4) * dt /6;
+    // Vector3 a0 = this->force / this->mass;
+    // real_t r = motion_damping / this->mass;
+    // Vector3 K1 = this->velocity, L1 = a0;
+    // Vector3 K2 = this->velocity + L1 * dt/2;
+    // Vector3 L2 = a0 - r * K2;
+    // Vector3 K3 = this->velocity + L2 * dt/2;
+    // Vector3 L3 = a0 - r * K3;
+    // Vector3 K4 = this->velocity + L3 * dt;
+    // Vector3 L4 = a0 - r * K4;
+    // this->velocity += (K1 + 2 * K2 + 2 * K3 + K4) * dt /6;
+    // this->position += (L1 + 2 * K2 + 2 * K3 + K4) * dt /6;
+    this->position += this->velocity * dt;
+    if (this->mass > 0.01f) this->velocity += this->force / this->mass * dt;
+    // std::cout<<this->position<<std::endl;
+    // std::cout<<this->velocity<<std::endl;
+    // while (this->position.y < -1.0f) this->position.y += 2.0f;
+    // this->sphere->position = this->position;
 
-    return position;
+    return this->velocity * dt;
 }
 
 Vector3 SphereBody::step_orientation( real_t dt, real_t motion_damping )
@@ -62,14 +70,32 @@ void SphereBody::apply_force( const Vector3& f, const Vector3& offset )
     // TODO apply force/torque to sphere
     // Update every time but not add up. 
     // Cause the spring force should update all the time and derive the change of the force is painful
-    this->force = f;
-    this->torque = cross(f, offset);
-}
-
-void SphereBody::add_force(const Vector3& f, const Vector3& offset){
     this->force += f;
     this->torque += cross(f, offset);
 }
+
+void SphereBody::reset_force(){
+    this->force = Vector3::Zero;
+    this->torque = Vector3::Zero;
+}
+
+bool SphereBody::velocity_check(){
+    if (length(this->velocity) < stopVelocity){
+        this->velocity = Vector3::Zero;
+        return false;
+    }
+
+    if (length(this->angular_velocity) < stopVelocity){
+        this->angular_velocity = Vector3::Zero;
+        return false;
+    }
+    return true;
+}
+
+// void SphereBody::apply_another_force(const Vector3& f, const Vector3& offset){
+//     this->force += f;
+//     this->torque += cross(f, offset);
+// }
 
 // Vector3 SphereBody::RK4_position(real_t dt){
 //     // Below are the sub-process of RK4, where dt can be h or h/2.
