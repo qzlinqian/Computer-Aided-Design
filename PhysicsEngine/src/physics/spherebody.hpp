@@ -17,6 +17,7 @@ public:
     real_t mass;
     Vector3 force;
     Vector3 torque;
+    // real_t damping;
 
     SphereBody( Sphere* geom );
     virtual ~SphereBody() { }
@@ -24,6 +25,7 @@ public:
     virtual Vector3 step_orientation( real_t dt, real_t motion_damping );
     virtual void apply_force( const Vector3& f, const Vector3& offset );
     virtual void reset_force();
+    // virtual void damping_adapt(real_t damping_this);
 
     bool velocity_check();
     // void apply_another_force(const Vector3& f, const Vector3& offset);

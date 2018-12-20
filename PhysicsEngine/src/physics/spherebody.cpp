@@ -21,6 +21,7 @@ SphereBody::SphereBody( Sphere* geom )
     angular_velocity = Vector3::Zero;
     force = Vector3::Zero;
     torque = Vector3::Zero;
+    // damping = 0;
 }
 
 Vector3 SphereBody::step_position( real_t dt, real_t motion_damping )
@@ -31,7 +32,8 @@ Vector3 SphereBody::step_position( real_t dt, real_t motion_damping )
     // TODO return the delta in position dt in the future
     // I have to ignore the change in spring force (with x). 
     // Here we see force as a const, and there's damping relating to the velocity, i.e., m v' = Force - cv; v = x'
-    // Vector3 a0 = this->force / this->mass;
+    Vector3 a0 = this->force / this->mass;
+    std::cout<<"a"<<a0<<std::endl;
     // real_t r = motion_damping / this->mass;
     // Vector3 K1 = this->velocity, L1 = a0;
     // Vector3 K2 = this->velocity + L1 * dt/2;
@@ -42,12 +44,12 @@ Vector3 SphereBody::step_position( real_t dt, real_t motion_damping )
     // Vector3 L4 = a0 - r * K4;
     // this->velocity += (K1 + 2 * K2 + 2 * K3 + K4) * dt /6;
     // this->position += (L1 + 2 * K2 + 2 * K3 + K4) * dt /6;
-    this->position += this->velocity * dt;
-    if (this->mass > 0.01f) this->velocity += this->force / this->mass * dt;
-    // std::cout<<this->position<<std::endl;
-    // std::cout<<this->velocity<<std::endl;
+    this->position += this->velocity * dt + 0.5 * a0 * dt * dt;
+    if (this->mass > 0.01f) this->velocity += a0 * dt;
+    // std::cout<<this->position<<std::endl; 
+    std::cout<<"v"<<this->velocity<<std::endl;
     // while (this->position.y < -1.0f) this->position.y += 2.0f;
-    // this->sphere->position = this->position;
+    this->sphere->position = this->position;
 
     return this->velocity * dt;
 }
@@ -61,8 +63,21 @@ Vector3 SphereBody::step_orientation( real_t dt, real_t motion_damping )
     // vec.x = rotation along x axis
     // vec.y = rotation along y axis
     // vec.z = rotation along z axis
+    real_t J = 0.4 * this->mass * this->radius * this->radius;
+    Vector3 alpha = this->torque / J;
+    Vector3 step_angle = this->angular_velocity * dt + 0.5 * alpha * dt * dt;
+    Quaternion r(step_angle, length(step_angle));
+    this->angular_velocity += alpha * dt;
+    std::cout<<"torque"<<this->torque<<std::endl;
+    std::cout<<"alpha"<<angular_velocity<<std::endl;
+    // When torque = 0, r is invalid!
+    if (length(step_angle) < 0.0000001f) r = Quaternion::Identity;
+    // std::cout<<r<<std::endl;
+    // std::cout<<this->orientation<<std::endl;
+    this->orientation = r * this->orientation;
+    this->sphere->orientation = this->orientation;
 
-    return Vector3::Zero;
+    return this->angular_velocity * dt;
 }
 
 void SphereBody::apply_force( const Vector3& f, const Vector3& offset )
@@ -71,7 +86,8 @@ void SphereBody::apply_force( const Vector3& f, const Vector3& offset )
     // Update every time but not add up. 
     // Cause the spring force should update all the time and derive the change of the force is painful
     this->force += f;
-    this->torque += cross(f, offset);
+    this->torque = cross(offset,f);
+    // offset = Vector3(this->orientation * offset);
 }
 
 void SphereBody::reset_force(){
@@ -91,6 +107,10 @@ bool SphereBody::velocity_check(){
     }
     return true;
 }
+
+// void SphereBody::damping_adapt(real_t damping_this){
+//     this->damping = damping_this;
+// }
 
 // void SphereBody::apply_another_force(const Vector3& f, const Vector3& offset){
 //     this->force += f;

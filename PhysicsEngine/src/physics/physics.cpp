@@ -44,11 +44,13 @@ void Physics::step( real_t dt )
         }
         // std::cout<<(*i)->position<<std::endl;
         // std::cout<<(*i)->mass<<std::endl;
+        (*i)->reset_force();
+        (*i)->apply_force(this->gravity * (*i)->mass, Vector3::Zero);
     }
 
 
     for (SpringList::iterator i = springs.begin(); i != springs.end(); i++){
-        // (*i)->step(dt);
+        (*i)->step(dt);
         // (*i)->body1->force += this->gravity;
         // (*i)->body2->force += this->gravity;
         // (*i)->body1->step_position(dt, (*i)->damping);
@@ -61,19 +63,22 @@ void Physics::step( real_t dt )
         // (*i)->body2->orientation *= (*i)->body2->angular_velocity * dt;
     }
     
-    Vector3 temp(0.0f,0.0f,0.0f);
     real_t j=0;
     for (SphereList::iterator i = spheres.begin(); i != spheres.end(); i++){
         // (*i)->reset_force();
-        (*i)->apply_force(this->gravity, temp);
+        
         // Vector3 tempPos(0.0f,0.0f,j);
         // (*i)->sphere->position = tempPos;
         // j += 0.2f;
         // (*i)->position += (*i)->step_position(dt, 0);
         // (*i)->orientation *= (*i)->angular_velocity * dt;
         // (*i)->sphere->position += (*i)->step_position(dt, 0);
+        (*i)->step_position(dt, 0);
+        // (*i)->sphere->orientation = (*i)->step_orientation(dt, 0) * (*i)->sphere->orientation;
+        (*i)->step_orientation(dt, 0);
         // (*i)->step_position(dt, 0);
         // (*i)->sphere->position += temp;
+        (*i)->reset_force();
     }
 }
 

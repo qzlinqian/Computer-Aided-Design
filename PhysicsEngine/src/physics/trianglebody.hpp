@@ -19,6 +19,7 @@ public:
     virtual Vector3 step_orientation( real_t dt, real_t motion_damping );
     virtual void apply_force( const Vector3& f, const Vector3& offset );
     virtual void reset_force(){}
+    // virtual void damping_adapt(){}
 
     Vector3 vertices[3];
 };

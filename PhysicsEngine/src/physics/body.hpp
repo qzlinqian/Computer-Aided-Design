@@ -23,6 +23,7 @@ public:
     virtual Vector3 step_orientation( real_t dt, real_t motion_damping ) = 0;
     virtual void apply_force( const Vector3& f, const Vector3& offset ) = 0;
     virtual void reset_force() = 0;
+    // virtual void damping_adapt() = 0;
 };
 
 }
