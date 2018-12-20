@@ -12,6 +12,7 @@ class SphereBody : public Body
 {
 public:
     static real_t stopVelocity;
+    static real_t stopOmega;
     Sphere* sphere;
     real_t radius;
     real_t mass;
@@ -28,6 +29,8 @@ public:
     // virtual void damping_adapt(real_t damping_this);
 
     bool velocity_check();
+    Vector3 step_velocity(double dt, double motion_damping);
+    Vector3 step_omega(double dt, double motion_damping);
     // void apply_another_force(const Vector3& f, const Vector3& offset);
     // void RK4_position(real_t dt);
     // void RK4_velocity(real_t dt);

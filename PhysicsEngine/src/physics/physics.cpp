@@ -25,6 +25,8 @@ void Physics::step( real_t dt )
     // change the position/orientation of the graphical object that represents
     // it
     // TODO collision check & velocity update
+    // dt /= 10;
+
     for ( PlaneList::iterator i = planes.begin(); i != planes.end(); i++ ){
         for ( SphereList::iterator j = spheres.begin(); j != spheres.end(); j++ ){
             collides(*(*j),*(*i),collision_damping);
@@ -44,8 +46,8 @@ void Physics::step( real_t dt )
         }
         // std::cout<<(*i)->position<<std::endl;
         // std::cout<<(*i)->mass<<std::endl;
-        (*i)->reset_force();
-        (*i)->apply_force(this->gravity * (*i)->mass, Vector3::Zero);
+        // (*i)->reset_force();
+        // (*i)->apply_force(this->gravity * (*i)->mass, Vector3::Zero);
     }
 
 
@@ -63,7 +65,7 @@ void Physics::step( real_t dt )
         // (*i)->body2->orientation *= (*i)->body2->angular_velocity * dt;
     }
     
-    real_t j=0;
+    // real_t j=0;
     for (SphereList::iterator i = spheres.begin(); i != spheres.end(); i++){
         // (*i)->reset_force();
         
@@ -78,13 +80,14 @@ void Physics::step( real_t dt )
         (*i)->step_orientation(dt, 0);
         // (*i)->step_position(dt, 0);
         // (*i)->sphere->position += temp;
-        (*i)->reset_force();
+        // (*i)->reset_force();
     }
 }
 
 void Physics::add_sphere( SphereBody* b )
 {
     spheres.push_back( b );
+    b->apply_force(gravity * b->mass, Vector3::Zero);
 }
 
 size_t Physics::num_spheres() const
@@ -115,6 +118,8 @@ size_t Physics::num_triangles() const
 void Physics::add_spring( Spring* s )
 {
     springs.push_back( s );
+    s->prev_body1_offset = s->body1_offset;
+    s->prev_body2_offset = s->body2_offset;
 }
 
 size_t Physics::num_springs() const

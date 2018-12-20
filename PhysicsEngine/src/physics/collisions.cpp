@@ -15,6 +15,10 @@ bool collides( SphereBody& body1, SphereBody& body2, real_t collision_damping )
     Vector3 v22 = dot(v1, d) * 2 * body1.mass / (body1.mass + body2.mass) * d;
     body2.velocity = v22 + body2.velocity;
     body1.velocity -= body2.mass / body1.mass * v22;
+
+    // Collision Damping
+    body1.velocity -= collision_damping * body1.velocity;
+    body2.velocity -= collision_damping * body2.velocity;
     return true;
 }
 
@@ -33,6 +37,7 @@ bool collides( SphereBody& body1, TriangleBody& body2, real_t collision_damping 
     Vector3 t3 = cross(body2.vertices[2]-projection, body2.vertices[0]-projection);
     if (dot(t1, t2) > 0 && dot(t2, t3) > 0){ // point is in the triangle
         body1.velocity -= 2 * dot(body1.velocity, normal) * normal;
+        body1.velocity -= collision_damping * body1.velocity;
         return true;
     }
 
@@ -55,6 +60,7 @@ bool collides( SphereBody& body1, TriangleBody& body2, real_t collision_damping 
             Vector3 normal_line = normalize(cross(normal, body2.vertices[(i+1)%3]-body2.vertices[i]));
             // Velocity update
             body1.velocity -= 2 * dot(body1.velocity, normal_line) * normal_line;
+            body1.velocity -= collision_damping * body1.velocity;
             return true;
         }
     }
@@ -71,6 +77,7 @@ bool collides( SphereBody& body1, PlaneBody& body2, real_t collision_damping )
     if (std::abs(d) > body1.radius) return false;  // d > r
     // Then update velocity
     body1.velocity -= 2 * dot(body1.velocity, body2.normal) * body2.normal;
+    body1.velocity -= collision_damping * body1.velocity;
 	return true;
 }
 

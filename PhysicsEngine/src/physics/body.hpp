@@ -7,6 +7,7 @@
 #include <iostream>
 
 namespace _462 {
+    #define _EPSILON 0.00001
 
 class Body
 {
