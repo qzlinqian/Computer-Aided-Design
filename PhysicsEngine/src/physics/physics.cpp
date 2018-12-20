@@ -41,7 +41,10 @@ void Physics::step( real_t dt )
 
     for ( SphereList::iterator i = spheres.begin(); i != spheres.end(); i++ ){
         for ( SphereList::iterator j = spheres.begin(); j != spheres.end(); j++ ){
-            if (j<=i) continue;
+            // if (j<=i) continue;
+            // That's interesting! With that, there are 4 balls moveing in newtons_cradle.scene.
+            // Because the collision happens in a serial, not spontenously, 
+            // i.e., even if 1 & 4 is free of collision at this frame, but after 3 collides with 4 and speed updated, 4 may collide with 1.
             collides(*(*j),*(*i),collision_damping);
         }
     }

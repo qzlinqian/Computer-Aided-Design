@@ -11,6 +11,7 @@ bool collides( SphereBody& body1, SphereBody& body2, real_t collision_damping )
     if (dis > body1.radius + body2.radius) return false;  // d>r1+r2
     // Then update velocity
     Vector3 v1 = body1.velocity - body2.velocity;
+    if (dot(d, v1) <= 0) return false; // apart or the same
     d /= dis;
     Vector3 v22 = dot(v1, d) * 2 * body1.mass / (body1.mass + body2.mass) * d;
     body2.velocity = v22 + body2.velocity;
