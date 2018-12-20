@@ -84,5 +84,6 @@ bool collides( SphereBody& body1, PlaneBody& body2, real_t collision_damping )
 // void collideWithPoint(SphereBody& body, Vector3 vertice){
 //     // Simplify, see sphere as a point
 // } That's too complex! Allocate the point to a line!
+// I was about to discuss the cases where sphere collides with a vertice of the triangle. But you konw, that possibility equals to zero and that's too complex.
 
 }

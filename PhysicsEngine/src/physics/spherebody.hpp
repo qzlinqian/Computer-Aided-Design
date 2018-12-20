@@ -18,22 +18,18 @@ public:
     real_t mass;
     Vector3 force;
     Vector3 torque;
-    // real_t damping;
 
     SphereBody( Sphere* geom );
     virtual ~SphereBody() { }
     virtual Vector3 step_position( real_t dt, real_t motion_damping );
     virtual Vector3 step_orientation( real_t dt, real_t motion_damping );
     virtual void apply_force( const Vector3& f, const Vector3& offset );
-    virtual void reset_force();
-    // virtual void damping_adapt(real_t damping_this);
+    // virtual void reset_force();
 
     bool velocity_check();
+    bool omega_check();
     Vector3 step_velocity(double dt, double motion_damping);
     Vector3 step_omega(double dt, double motion_damping);
-    // void apply_another_force(const Vector3& f, const Vector3& offset);
-    // void RK4_position(real_t dt);
-    // void RK4_velocity(real_t dt);
 };
 
 }

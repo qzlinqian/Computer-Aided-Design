@@ -25,7 +25,7 @@ void Physics::step( real_t dt )
     // change the position/orientation of the graphical object that represents
     // it
     // TODO collision check & velocity update
-    // dt /= 10;
+    // dt /= 10;  // To slow down the speed of the frame, or I couldnot see it :)
 
     for ( PlaneList::iterator i = planes.begin(); i != planes.end(); i++ ){
         for ( SphereList::iterator j = spheres.begin(); j != spheres.end(); j++ ){
@@ -44,43 +44,16 @@ void Physics::step( real_t dt )
             if (j<=i) continue;
             collides(*(*j),*(*i),collision_damping);
         }
-        // std::cout<<(*i)->position<<std::endl;
-        // std::cout<<(*i)->mass<<std::endl;
-        // (*i)->reset_force();
-        // (*i)->apply_force(this->gravity * (*i)->mass, Vector3::Zero);
     }
 
 
     for (SpringList::iterator i = springs.begin(); i != springs.end(); i++){
         (*i)->step(dt);
-        // (*i)->body1->force += this->gravity;
-        // (*i)->body2->force += this->gravity;
-        // (*i)->body1->step_position(dt, (*i)->damping);
-        // (*i)->body1->step_orientation(dt, (*i)->damping);
-        // (*i)->body1->position -= (*i)->body1->velocity * dt;  // Will be added again later, so that we do not need to mark which sphere has been udpated
-        // (*i)->body1->orientation *= (*i)->body1->angular_velocity * dt;
-        // (*i)->body2->step_position(dt, (*i)->damping);
-        // (*i)->body2->step_orientation(dt, (*i)->damping);
-        // (*i)->body2->position -= (*i)->body1->velocity * dt;  // Will be added again later
-        // (*i)->body2->orientation *= (*i)->body2->angular_velocity * dt;
     }
     
-    // real_t j=0;
     for (SphereList::iterator i = spheres.begin(); i != spheres.end(); i++){
-        // (*i)->reset_force();
-        
-        // Vector3 tempPos(0.0f,0.0f,j);
-        // (*i)->sphere->position = tempPos;
-        // j += 0.2f;
-        // (*i)->position += (*i)->step_position(dt, 0);
-        // (*i)->orientation *= (*i)->angular_velocity * dt;
-        // (*i)->sphere->position += (*i)->step_position(dt, 0);
         (*i)->step_position(dt, 0);
-        // (*i)->sphere->orientation = (*i)->step_orientation(dt, 0) * (*i)->sphere->orientation;
         (*i)->step_orientation(dt, 0);
-        // (*i)->step_position(dt, 0);
-        // (*i)->sphere->position += temp;
-        // (*i)->reset_force();
     }
 }
 
