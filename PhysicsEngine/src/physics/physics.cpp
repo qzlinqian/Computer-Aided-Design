@@ -25,7 +25,7 @@ void Physics::step( real_t dt )
     // change the position/orientation of the graphical object that represents
     // it
     // TODO collision check & velocity update
-    // dt /= 10;  // To slow down the speed of the frame, or I couldnot see it :)
+    // dt /= 4;  // To slow down the speed of the frame, or I couldnot see it :)
 
     for ( PlaneList::iterator i = planes.begin(); i != planes.end(); i++ ){
         for ( SphereList::iterator j = spheres.begin(); j != spheres.end(); j++ ){
