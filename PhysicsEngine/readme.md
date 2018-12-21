@@ -4,6 +4,18 @@ The final project of the course. It's a course assignment of a Computer Aided De
 
 #### Demo
 
+<figure class="half">
+    <img src="demo/1.gif">
+    <img src="demo/2.gif">
+    <img src="demo/3.gif">
+</figure>
+
+<figure class="third">
+    <img src="demo/4.gif">
+    <img src="demo/5.gif">
+    <img src="demo/6.gif">
+</figure>
+
 
 
 #### Implement Details
