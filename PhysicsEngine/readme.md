@@ -4,17 +4,26 @@ The final project of the course. It's a course assignment of a Computer Aided De
 
 #### Demo
 
-![](demo/1.gif)
 
-![](demo/2.gif)
 
-![](demo/3.gif)
+#### Implement Details
 
-![](demo/4.gif)
+* **Collision** Detection
+  * Sphere & Sphere: A collision would happen when <img src="https://latex.codecogs.com/gif.latex?\overrightarrow{O_1O_2}<r_1&plus;r_2" title="\overrightarrow{O_1O_2}<r_1+r_2" /> and <img src="https://latex.codecogs.com/gif.latex?(\vec{v}_1-\vec{v}_2)\cdot\overrightarrow{O_1O_2}>0" title="(\vec{v}_1-\vec{v}_2)\cdot\overrightarrow{O_1O_2}>0" />. 
+  * Sphere & Plane: d<r and sphere moves towards the plane.
+  * Sphere & Triangle: When the projection of the sphere center on the triangle's plane falls in the triangle ( i.e., <img src="https://latex.codecogs.com/gif.latex?\overrightarrow{PA_0}&space;\times&space;\overrightarrow{PA_1},&space;\overrightarrow{PA_1}\times&space;\overrightarrow{PA_2},&space;\overrightarrow{PA_2}\times&space;\overrightarrow{PA_0}" title="\overrightarrow{PA_0} \times \overrightarrow{PA_1}, \overrightarrow{PA_1}\times \overrightarrow{PA_2}, \overrightarrow{PA_2}\times \overrightarrow{PA_0}" /> parallel with each other), same as the plane case. Otherwise, consider the projection of P on the three edges' lines (if falls outside, the select the nearest vertex). Calculate the  distance of the three selected points to the sphere center respectively; one of them is the nearest distance of the two bodies, which is also the collision point if collision happens.
+* **Spring** Force Apply
+  * The step() function applies forces and torques to the attached bodies.
+  * The force is applied every frame, so we should clear the force applied in the previous frame.
+* **SphereBody** Integration
+  * The force varies with velocity and position. So we need to use 2-degree RK4 in **Physics** and call the Spring::step to update force (acceleration). The motion_damping used in **SphereBody**'s step functions also need to be updated by **Spring**, which is a little troublesome. I just see force as a constant in every frame.
+  * If I use <img src="https://latex.codecogs.com/gif.latex?\begin{cases}&space;v&space;=&space;v_0&space;&plus;&space;dt&space;\cdot&space;a&space;\\&space;x&space;=&space;dt&space;\cdot&space;v_0&space;&plus;&space;\frac{1}{2}&space;a\cdot&space;dt^2&space;\end{cases}" title="\begin{cases} v = v_0 + dt \cdot a \\ x = dt \cdot v_0 + \frac{1}{2} a\cdot dt^2 \end{cases}" /> directly, the error could not be neglected and would finally causes huge deviation. The time is limited to complete this task, so I used my friends' method --- <img src="https://latex.codecogs.com/gif.latex?\begin{align*}&space;K1&space;=hf(t),&space;K2&=hf(t&plus;dt/2),&space;K3=hf(t&plus;dt/2),&space;K4=hf(t&plus;dt),&space;\\&space;dx&space;&=(K1&plus;2K2&plus;2K3&plus;K4)/6&space;\end{align*}" title="\begin{align*} K1 =hf(t), K2&=hf(t+dt/2), K3=hf(t+dt/2), K4=hf(t+dt), \\ dx &=(K1+2K2+2K3+K4)/6 \end{align*}" />
 
-![](demo/5.gif)
-
-![](demo/6.gif)
+* **Physics** Move Forward
+  * The position and angular_position of a SphereBody::Sphere has already been updated in **SphereBody**, so in **Physics** the only thing to do is to call them. The gravity is applied in the initialization.
+  * Fisrt, check collisions by traverse the sphere list and check them with the other bodies (including sphere).
+  * Traverse the spring list, apply forces.
+  * Traverse all the sphere and update them.
 
 #### Environment & Dependencies
 
