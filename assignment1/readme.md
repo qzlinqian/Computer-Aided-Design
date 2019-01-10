@@ -1,6 +1,6 @@
 ## 用 OpenGL 进行三维模型的显示
 
-![](demo.gif)
+![](http://www.qianl.in/2019/01/10/physicsEngine/a1.gif)
 
 #### 作业要求
 

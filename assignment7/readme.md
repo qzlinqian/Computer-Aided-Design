@@ -1,6 +1,6 @@
 ## 光照效果
 
-![](demo.gif)
+![](http://www.qianl.in/2019/01/10/physicsEngine/a7.gif)
 
 #### 作业要求
 
