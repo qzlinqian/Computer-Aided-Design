@@ -5,17 +5,29 @@ The source code of the assignments of Fundamentals of Computer Aided Design.
 #### Demo
 
 * **Assignment 1** -- load a 3D model from obj file; use keyboard to change visual angle and color.
+
   <img src="http://www.qianl.in/2019/01/10/physicsEngine/a1.gif" width="50%" height="50%">
+
 * **Assignment 2** -- rotating stars. The stars rotate as logarithmic spiral.
+
   <img src="http://www.qianl.in/2019/01/10/physicsEngine/a2.gif" width="50%" height="50%">
+
 * **Assignment 3** -- snow falling. The snowflakes have different sizes and their number increases gradually.
+
   <img src="http://www.qianl.in/2019/01/10/physicsEngine/a3.gif" width="50%" height="50%">
+
 * **Assignment 4** -- solar system.
+
   <img src="http://www.qianl.in/2019/01/10/physicsEngine/a4.gif" width="50%" height="50%">
+
 * **Assignment 5** -- Bezier surface.
+
   <img src="http://www.qianl.in/2019/01/10/physicsEngine/a5.gif" width="50%" height="50%">
+
 * **Assignment 7** -- illumination effect. Add lights to the model in assignment 1.
+
   <img src="http://www.qianl.in/2019/01/10/physicsEngine/a7.gif" width="50%" height="50%">
+
 * Assignment 6 is a design work, so there's no code :-D.
 * **Final Project** -- [Physics Engine](https://github.com/qzlinqian/Computer-Aided-Design/tree/master/PhysicsEngine).
 
