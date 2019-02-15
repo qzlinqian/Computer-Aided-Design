@@ -1,6 +1,6 @@
 ## 旋转的星星
 
-![](http://www.qianl.in/2019/01/10/physicsEngine/a2.gif)
+![](http://pic.qianl.in/uploads/big/b3c620bf4b440b3da8f77672b1dce9a4.gif)
 
 #### 作业要求
 

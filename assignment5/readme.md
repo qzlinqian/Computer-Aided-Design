@@ -1,6 +1,6 @@
 ## *Bezier*曲面
 
-![](http://www.qianl.in/2019/01/10/physicsEngine/a5.gif)
+![](http://pic.qianl.in/uploads/big/01ce4ec550f667ff31d5ba5bfcb80fc3.gif)
 
 #### 作业要求
 
